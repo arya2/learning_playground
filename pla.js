@@ -1,9 +1,5 @@
 (function () {
     'use strict';
-
-    function castit(num1) {
-        return num1 ? 1 : -1;
-    }
     
     function genpoints() {
         return [1, 2 * Math.random() - 1, 2 * Math.random() - 1];  //generates a point between -1 and 1, returns [x0 = 1, x1, x2]
@@ -14,14 +10,14 @@
             w = [];
         
         w[1] = points[0][2] - points[1][2];   //weight of x1
-        w[2] = - (points[0][1] - points[1][1]);   //weight of x2
-        w[0] = - w[2] * points[1][1] - w[1] * points[1][2];
+        w[2] = -(points[0][1] - points[1][1]);   //weight of x2
+        w[0] = -w[2] * points[1][1] - w[1] * points[1][2];
     
-        return w; //returns the line in standard form [a,b,c] ay - bx + c = 0
+        return w; //returns the line in standard form [w0, w1, w2] w0 * x0 + w1 * x1 + w2 * x2 = 0
     }
 
     function check(line, point) {
-        return (line[0] * point[0] + line[1] * point[1] + line[2] * point[2]) > 0; // checks if a point is above or below a line
+        return ((line[0] * point[0] + line[1] * point[1] + line[2] * point[2]) > 0) ? 1 : -1; // checks if a point is above or below a line
     }
 
     function createdata(N) {
@@ -37,43 +33,57 @@
             });
         }
         
-        console.log("f: " + f)
-        return data;  //returns data
+        return [data, f];  //returns data
     }
-
+    
+    function adjusted(w, p) {
+        var learnrate = 0.1,
+            len = w.length;
+        
+        for (var i = 0; i < len; i += 1) {
+            w[i] = w[i] + p.result * learnrate * p.point[i];
+        }
+        
+        return w;
+    }
+    
     function pla() {
         var h = [0, 0, 0],
-            data = createdata(10),
-            counter,
+            datastore = createdata(10),
+            data = datastore[0],
+            target = datastore[1],
+            flag = 0,
+            done = false,
             datapoint;
-
-        while (data.length > 0 || ) {
+        
+        while (!done) {
             datapoint = data.pop();
             
             if (check(h, datapoint.point) !== datapoint.result) {
+                flag = 0;
                 data.splice(Math.floor((data.length * Math.random())), 0, datapoint);
-                for (counter = 0; counter < 3; counter = counter + 1) {
-                    h[counter] = h[counter] + 0.01 * castit(datapoint.result);
-                    console.log(0.01 * castit(datapoint.result));
+                h = adjusted(h, datapoint)
+            } else {
+                flag = flag + 1;
+                data.unshift(datapoint);
+                if (flag > 2 * data.length) {
+                    done = true;
                 }
             }
         }
-        
-        return h;
+        return [h, target];
     }
     
     function test() {
-        var isittrue = {"true": 0, "false": 0},
-            counter;
-        for (counter = 0; counter < 100; counter = counter + 1) {
-            if (check(linegen(), genpoints())) {
-                isittrue.true = isittrue.true + 1
-            }else{
-                isittrue.false = isittrue.false + 1
-            }
-        }
-        return isittrue
-    }
+        var results = pla(),
+            diff = [];
+        
+        diff.push((results[0][0]-results[1][0])/Math.abs(results[0][0]+results[1][0]));
+        diff.push((results[0][1]-results[1][1])/Math.abs(results[0][1]+results[1][1]));
+        diff.push((results[0][2]-results[1][2])/Math.abs(results[0][2]+results[1][2]));
+            
+        return diff;
+    }    
     
-    console.log(pla());
+    console.log(test());
 }());
