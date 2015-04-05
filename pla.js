@@ -74,16 +74,31 @@
         return [h, target];
     }
     
-    function test() {
-        var results = pla(),
-            diff = [];
-        
-        diff.push((results[0][0]-results[1][0])/Math.abs(results[0][0]+results[1][0]));
-        diff.push((results[0][1]-results[1][1])/Math.abs(results[0][1]+results[1][1]));
-        diff.push((results[0][2]-results[1][2])/Math.abs(results[0][2]+results[1][2]));
+    var testSuite = {
+        "run": function(){
+            var numTests = testSuite.tests.length;
             
-        return diff;
-    }    
+            for (var i = 0; i < numTests; i += 1) {
+                console.log((testSuite.tests[i])());
+            }
+        },
+        "tests": [
+            function(){
+                var pset = [],
+                    l,
+                    h;
+                
+                for (var i = 0; i < 100; i += 1) {
+                    var p = genpoints();
+                    pset.push(p);
+                    l = (p[2] < l) ? p[2] : l;
+                    h = (p[2] > h) ? p[2] : h;
+                }
+                
+                return pset[0]
+            }
+        ]
+    }
     
-    console.log(test());
+    testSuite.run();
 }());
