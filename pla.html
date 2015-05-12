@@ -149,13 +149,13 @@
                 function graph(c, w){
                     drawGraph(c);
                     
-                    var offset = 200 - w[0]
+                    var offset = 200 * w[0]
                     var slope = w[1]/w[2]
                     var x1 = 0
-                    var y1 = 200 * slope
-                    
+                    var y1 = 200 * slope + offset
+                                        
                     var x2 = 400
-                    var y2 = -200 * slope
+                    var y2 = -200 * slope + offset
                     
                     c.beginPath();
                     c.strokeStyle = "#a06";
